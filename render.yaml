@@ -51,11 +51,6 @@ services:
     # Build settings
     rootDir: .
     
-    # Disk configuration (for persistent data if needed)
-    disk:
-      name: memu-storage
-      mountPath: /app/storage
-      sizeGB: 1
 
   # Web Service - Health Check and Management API
   - type: web
@@ -98,12 +93,7 @@ services:
     # Build settings
     rootDir: .
 
-# Database configuration (if needed for caching/state)
-databases:
-  - name: memu-cache
-    databaseName: memu_cache
-    user: memu_user
-    plan: starter  # Free PostgreSQL
+# Database configuration removed (legacy plans are no longer supported for new databases)
 
 # Environment Groups (shared configuration)
 envVarGroups:
