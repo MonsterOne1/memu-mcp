@@ -6,7 +6,7 @@ memu-py>=1.0.0
 
 # Core dependencies
 aiohttp>=3.9.0
-asyncio>=3.11.0
+aiohttp-cors>=0.7.0
 pydantic>=2.5.0
 pydantic-settings>=2.1.0
 python-dotenv>=1.0.0
