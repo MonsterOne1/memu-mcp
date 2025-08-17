@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # Production memU MCP Server
+  memu-mcp-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: memu-mcp-server
+    environment:
+      - MEMU_API_KEY=${MEMU_API_KEY}
+      - MEMU_BASE_URL=${MEMU_BASE_URL:-https://api.memu.so}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - DEFAULT_USER_ID=${DEFAULT_USER_ID:-default_user}
+      - DEFAULT_AGENT_ID=${DEFAULT_AGENT_ID:-default_agent}
+      - MAX_CONVERSATION_LENGTH=${MAX_CONVERSATION_LENGTH:-8000}
+      - RATE_LIMIT_PER_MINUTE=${RATE_LIMIT_PER_MINUTE:-60}
+      - RATE_LIMIT_PER_HOUR=${RATE_LIMIT_PER_HOUR:-1000}
+      - API_TIMEOUT=${API_TIMEOUT:-30}
+    volumes:
+      - ./config:/app/config:ro
+      - ./logs:/app/logs
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      - memu-network
+
+  # Development version with additional tools
+  memu-mcp-server-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: memu-mcp-server-dev
+    environment:
+      - MEMU_API_KEY=${MEMU_API_KEY}
+      - MEMU_BASE_URL=${MEMU_BASE_URL:-https://api.memu.so}
+      - LOG_LEVEL=DEBUG
+      - DEFAULT_USER_ID=${DEFAULT_USER_ID:-default_user}
+      - DEFAULT_AGENT_ID=${DEFAULT_AGENT_ID:-default_agent}
+    volumes:
+      - .:/app
+      - /app/.venv  # Exclude virtual environment from volume mount
+    working_dir: /app
+    stdin_open: true
+    tty: true
+    command: ["python", "-m", "memu_mcp_server.main", "--log-level", "DEBUG"]
+    networks:
+      - memu-network
+    profiles:
+      - development
+
+  # Testing container
+  memu-test:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: memu-test
+    environment:
+      - MEMU_API_KEY=test_key
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: ["pytest", "tests/", "-v", "--cov=src/memu_mcp_server"]
+    networks:
+      - memu-network
+    profiles:
+      - testing
+
+networks:
+  memu-network:
+    driver: bridge
+
+volumes:
+  memu-logs:
+    driver: local

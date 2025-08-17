@@ -1,0 +1,135 @@
+# Render Blueprint for memU MCP Server
+# Infrastructure as Code configuration for Render platform
+
+services:
+  # Background Worker - Core MCP Server
+  - type: worker
+    name: memu-mcp-worker
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m memu_mcp_server.main --render-mode
+    envVars:
+      - key: MEMU_API_KEY
+        sync: false  # Secret - configure in Render Dashboard
+      - key: MEMU_BASE_URL
+        value: https://api.memu.so
+      - key: LOG_LEVEL
+        value: INFO
+      - key: RENDER_DEPLOYMENT
+        value: "true"
+      - key: MCP_SERVER_NAME
+        value: memu-mcp-server-render
+      - key: DEFAULT_USER_ID
+        value: render_user
+      - key: DEFAULT_AGENT_ID
+        value: render_agent
+      - key: MAX_CONVERSATION_LENGTH
+        value: "8000"
+      - key: MEMORY_RETENTION_DAYS
+        value: "30"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "60"
+      - key: RATE_LIMIT_PER_HOUR
+        value: "1000"
+      - key: API_TIMEOUT
+        value: "30"
+      - key: WORKER_RESTART_DELAY
+        value: "5"
+      - key: MAX_RETRY_ATTEMPTS
+        value: "3"
+    
+    # Health check (for paid plans)
+    healthCheckPath: /health
+    
+    # Auto-scaling configuration (for paid plans)
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+    
+    # Resource allocation
+    plan: starter  # Can be: starter, standard, pro
+    
+    # Build settings
+    rootDir: .
+    
+    # Disk configuration (for persistent data if needed)
+    disk:
+      name: memu-storage
+      mountPath: /app/storage
+      sizeGB: 1
+
+  # Web Service - Health Check and Management API
+  - type: web
+    name: memu-mcp-api
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m memu_mcp_server.api --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: MEMU_API_KEY
+        sync: false  # Secret - configure in Render Dashboard
+      - key: MEMU_BASE_URL
+        value: https://api.memu.so
+      - key: LOG_LEVEL
+        value: INFO
+      - key: RENDER_DEPLOYMENT
+        value: "true"
+      - key: API_MODE
+        value: "true"
+      - key: ENABLE_CORS
+        value: "true"
+      - key: API_RATE_LIMIT
+        value: "100"
+    
+    # Health check
+    healthCheckPath: /health
+    
+    # Domain configuration
+    domains:
+      - memu-mcp-server.onrender.com
+    
+    # Auto-scaling
+    scaling:
+      minInstances: 1
+      maxInstances: 2
+    
+    # Resource allocation
+    plan: starter
+    
+    # Build settings
+    rootDir: .
+    
+    # Headers for security
+    headers:
+      - path: /*
+        name: X-Content-Type-Options
+        value: nosniff
+      - path: /*
+        name: X-Frame-Options
+        value: DENY
+      - path: /*
+        name: X-XSS-Protection
+        value: 1; mode=block
+
+# Database configuration (if needed for caching/state)
+databases:
+  - name: memu-cache
+    databaseName: memu_cache
+    user: memu_user
+    plan: starter  # Free PostgreSQL
+
+# Environment Groups (shared configuration)
+envVarGroups:
+  - name: memu-shared-config
+    envVars:
+      - key: PYTHONPATH
+        value: /app/src
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      - key: PYTHONDONTWRITEBYTECODE
+        value: "1"
+      - key: TZ
+        value: UTC
+      - key: LC_ALL
+        value: C.UTF-8
+      - key: LANG
+        value: C.UTF-8

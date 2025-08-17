@@ -1,0 +1,15 @@
+{
+  "memu_api_key": "your_memu_api_key_here",
+  "memu_base_url": "https://api.memu.so",
+  "server_name": "memu-mcp-server",
+  "server_version": "0.1.0",
+  "log_level": "INFO",
+  "default_user_id": "default_user",
+  "default_agent_id": "default_agent",
+  "max_conversation_length": 8000,
+  "memory_retention_days": 30,
+  "rate_limit_per_minute": 60,
+  "rate_limit_per_hour": 1000,
+  "allowed_origins": "*",
+  "api_timeout": 30
+}

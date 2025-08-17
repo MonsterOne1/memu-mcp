@@ -1,0 +1,38 @@
+# Requirements for Render deployment
+# Optimized for cloud environment with specific versions
+
+# Core MCP and memU dependencies
+mcp>=1.0.0
+memu-py>=1.0.0
+
+# Web framework for API service
+aiohttp>=3.9.0,<4.0.0
+aiohttp-cors>=0.7.0
+
+# Configuration and validation
+pydantic>=2.5.0,<3.0.0
+pydantic-settings>=2.1.0
+
+# Environment management
+python-dotenv>=1.0.0
+
+# Logging and monitoring
+structlog>=23.2.0
+rich>=13.7.0
+
+# System monitoring (for metrics endpoint)
+psutil>=5.9.0
+
+# JSON handling (usually built-in but explicit for clarity)
+# ujson>=5.8.0  # Optional: faster JSON parsing
+
+# Async utilities
+asyncio-mqtt>=0.16.0  # If MQTT support is needed
+
+# HTTP client for health checks
+# httpx>=0.25.0  # Alternative to aiohttp client
+
+# Development and testing (only for local dev)
+# pytest>=7.4.0
+# pytest-asyncio>=0.21.0
+# black>=23.12.0
