@@ -39,12 +39,11 @@ services:
         value: "3"
     
     # Health check (for paid plans)
-    healthCheckPath: /health
-    
     # Auto-scaling configuration (for paid plans)
     scaling:
       minInstances: 1
       maxInstances: 3
+      targetCPUPercent: 60
     
     # Resource allocation
     plan: starter  # Can be: starter, standard, pro
@@ -91,24 +90,13 @@ services:
     scaling:
       minInstances: 1
       maxInstances: 2
+      targetCPUPercent: 60
     
     # Resource allocation
     plan: starter
     
     # Build settings
     rootDir: .
-    
-    # Headers for security
-    headers:
-      - path: /*
-        name: X-Content-Type-Options
-        value: nosniff
-      - path: /*
-        name: X-Frame-Options
-        value: DENY
-      - path: /*
-        name: X-XSS-Protection
-        value: 1; mode=block
 
 # Database configuration (if needed for caching/state)
 databases:
