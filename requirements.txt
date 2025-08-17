@@ -2,7 +2,7 @@
 mcp>=1.0.0
 
 # memU SDK
-memu-py>=1.0.0
+memu-py==0.1.8
 
 # Core dependencies
 aiohttp>=3.9.0
